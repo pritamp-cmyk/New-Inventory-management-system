@@ -4,7 +4,7 @@
 using namespace std;
 #include "PostgresConnection.h"
 #include "../interfaces/IproductRepo.h"
-#include "domain/product.h"
+#include "../../domain/product.h"
 
 class ProductRepo : public IproductRepo{
     public:

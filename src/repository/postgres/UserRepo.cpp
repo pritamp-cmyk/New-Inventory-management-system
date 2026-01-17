@@ -3,8 +3,9 @@
 using namespace std;
 #include "PostgresConnection.h"
 
-#include "../interfaces/IuserRepo.h"
+#include "../../domain/product.h"
 #include "../../domain/user.h"
+#include "../interfaces/IuserRepo.h"
 
 class UserRepo : public IuserRepo {
     public:
