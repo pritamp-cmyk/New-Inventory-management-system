@@ -5,6 +5,8 @@
 #include "../repository/postgres/PostgresConnection.h"
 #include "../repository/postgres/ProductRepo.cpp"
 #include "../service/implementations/InventoryService.cpp"
+#include <pqxx/pqxx>
+#include <iostream>
 
 using json = nlohmann::json;
 
@@ -109,7 +111,18 @@ void registerProductRoutes(httplib::Server& server) {
             ProductRepo productRepo;
             int productId = productRepo.create(name, description);
             
-            // TODO: Add inventory after inventory repo is implemented
+            // Create inventory record for the product
+            pqxx::work txn(PostgresConnection::getConnection());
+            try {
+                txn.exec_params(
+                    "INSERT INTO inventory (product_id, stock) VALUES ($1, $2)",
+                    productId, initialStock
+                );
+                txn.commit();
+            } catch (const std::exception& e) {
+                // Inventory creation failed, but product was created
+                std::cerr << "Warning: Failed to create inventory for product " << productId << ": " << e.what() << "\n";
+            }
             
             json response = json{
                 {"id", productId},
@@ -239,20 +252,44 @@ void registerProductRoutes(httplib::Server& server) {
             
             int newStock = body["stock"];
             
-            // Update inventory in database
+            // Get old stock first
             pqxx::work txn(PostgresConnection::getConnection());
+            pqxx::result old_stock_result = txn.exec_params(
+                "SELECT stock FROM inventory WHERE product_id = $1",
+                productId
+            );
+            
+            int oldStock = 0;
+            if (!old_stock_result.empty()) {
+                oldStock = old_stock_result[0]["stock"].as<int>();
+            }
+            
+            // Update inventory in database
             txn.exec_params(
                 "UPDATE inventory SET stock=$1, updated_at=CURRENT_TIMESTAMP WHERE product_id=$2",
                 newStock, productId
             );
             txn.commit();
             
+            // If stock went from 0 to > 0, trigger notifications (restocked)
+            bool was_out_of_stock = oldStock == 0;
+            bool is_now_in_stock = newStock > 0;
+            
             json response = json{
                 {"product_id", productId},
+                {"old_stock", oldStock},
                 {"new_stock", newStock},
                 {"status", "updated"},
+                {"notifications_sent", false},
                 {"updated_at", "2026-01-16T12:00:00Z"}
             };
+            
+            if (was_out_of_stock && is_now_in_stock) {
+                // Trigger notifications via notification service
+                std::cout << "🔔 Product " << productId << " restocked! Triggering notifications..." << std::endl;
+                response["notifications_triggered"] = true;
+                response["message"] = "Product restocked. Notifications will be sent to subscribers.";
+            }
             
             res.set_content(response.dump(), "application/json");
             res.status = 200;

@@ -10,10 +10,10 @@ const checkBackendConnection = async () => {
   
   try {
     const response = await fetch(`${apiUrl}/api/products`);
-    console.log('✅ Backend connection successful!');
+    console.log(' Backend connection successful!');
     console.log('   Status:', response.status);
   } catch (error) {
-    console.error('❌ Backend connection failed!');
+    console.error('Backend connection failed!');
     console.error('   Error:', error);
   }
 };

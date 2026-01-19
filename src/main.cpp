@@ -4,6 +4,7 @@
 #include "../src/controller/ProductRoutes.h"
 #include "../src/controller/UserRoutes.h"
 #include "../src/controller/SubscriptionRoutes.h"
+#include "../src/controller/NotificationController.h"
 
 int main() {
     httplib::Server server;
@@ -31,8 +32,10 @@ int main() {
     registerProductRoutes(server);
     registerUserRoutes(server);
     registerSubscriptionRoutes(server);
+    NotificationController::registerRoutes(server);
 
     std::cout << "Server running on http://localhost:8080\n";
     std::cout << "CORS enabled for all origins\n";
+    std::cout << "Notification system initialized\n";
     server.listen("0.0.0.0", 8080);
 }

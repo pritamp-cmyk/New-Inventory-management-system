@@ -44,10 +44,10 @@ export const productAPI = {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log('✅ Product created:', data);
+      console.log('Product created:', data);
       return data;
     } catch (error) {
-      console.error('❌ Create product failed:', error);
+      console.error(' Create product failed:', error);
       throw error;
     }
   },
@@ -64,10 +64,10 @@ export const productAPI = {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log('✅ Product updated:', data);
+      console.log('Product updated:', data);
       return data;
     } catch (error) {
-      console.error('❌ Update product failed:', error);
+      console.error('Update product failed:', error);
       throw error;
     }
   },
@@ -82,10 +82,10 @@ export const productAPI = {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
       const data = await response.json();
-      console.log('✅ Product deleted:', data);
+      console.log('Product deleted:', data);
       return data;
     } catch (error) {
-      console.error('❌ Delete product failed:', error);
+      console.error('Delete product failed:', error);
       throw error;
     }
   },

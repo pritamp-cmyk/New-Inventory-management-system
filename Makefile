@@ -28,12 +28,16 @@ src/main.cpp \
 src/controller/ProductController.cpp \
 src/controller/UserController.cpp \
 src/controller/SubscriptionController.cpp \
+src/controller/NotificationController.cpp \
 src/service/implementations/InventoryService.cpp \
 src/service/implementations/UserService.cpp \
 src/service/implementations/SubscriptionService.cpp \
+src/service/implementations/NotificationService.cpp \
 src/repository/postgres/ProductRepo.cpp \
 src/repository/postgres/UserRepo.cpp \
-src/repository/postgres/SubscriptionRepo.cpp
+src/repository/postgres/SubscriptionRepo.cpp \
+src/repository/postgres/NotificationRepo.cpp \
+src/repository/postgres/PostgresConnection.cpp
 
 # ========================
 # Output binary

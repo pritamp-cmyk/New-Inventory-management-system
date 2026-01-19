@@ -8,11 +8,6 @@ interface Product {
   price?: number;
 }
 
-interface Inventory {
-  product_id: number;
-  stock: number;
-}
-
 const ProductPage: React.FC = () => {
   const [products, setProducts] = useState<Product[]>([]);
   const [inventory, setInventory] = useState<{ [key: number]: number }>({});

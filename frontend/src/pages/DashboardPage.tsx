@@ -41,19 +41,20 @@ const DashboardPage: React.FC = () => {
       const userArray = Array.isArray(users) ? users : [];
       const subscriptionArray = Array.isArray(subscriptions) ? subscriptions : [];
 
-      // Get inventory details for low stock check
+      // Get inventory details for low stock check (with error handling)
       const lowStockProducts: any[] = [];
       for (const product of productArray) {
         try {
-          const stock = await inventoryAPI.getStock(product.id);
-          if (stock && stock.quantity < 50) {
+          const inventory = await inventoryAPI.getStock(product.id);
+          if (inventory && inventory.stock < 50) {
             lowStockProducts.push({
               ...product,
-              quantity: stock.quantity,
+              quantity: inventory.stock,
             });
           }
         } catch {
-          // Continue if stock fetch fails
+          // Silently continue if inventory doesn't exist for this product
+          console.log(`No inventory found for product ${product.id}`);
         }
       }
 
@@ -69,8 +70,9 @@ const DashboardPage: React.FC = () => {
 
       setRecentProducts(productArray.slice(0, 5));
       setLowStockAlerts(lowStockProducts.slice(0, 5));
-    } catch (err) {
-      setError('Failed to load dashboard');
+    } catch (err: any) {
+      console.error('Dashboard error:', err);
+      setError(`Failed to load dashboard: ${err.message}`);
     } finally {
       setLoading(false);
     }
@@ -160,10 +162,7 @@ const DashboardPage: React.FC = () => {
                   <div key={product.id} className="product-preview-card">
                     <div className="product-preview-id">#{product.id}</div>
                     <h3>{product.name}</h3>
-                    <p className="product-preview-desc">{product.description}</p>
-                    <div className="product-preview-price">
-                      ${product.price?.toFixed(2) || '0.00'}
-                    </div>
+                    <p className="product-preview-desc">{product.description || 'No description'}</p>
                   </div>
                 ))}
               </div>
